@@ -11,6 +11,7 @@ import java.io.FileWriter
  * [x] java/kotlin代码
  * [x] xml 布局文件
  * [x] kotlin模版字符串
+ * [x] 支持多个、多种预设映射表，支持拓展
  * [x] 自动生成xmlkey值、防重复策略
  * [x] 自动替换引用
  * [x] 自动导包
@@ -48,7 +49,10 @@ object Main {
         val keyMap = LinkedHashMap<String, String>()
         val presetKeyMap = LinkedHashMap<String, String>()
 
-        initPreSetKey(arrayOf(XMLKeyParser("$modulePath/src/main/res/values/strings.xml")), presetKeyMap)
+        // 预设的中文 - key映射，默认只读取 strings文件
+        initPreSetKey(
+                arrayOf(XMLKeyParser("$modulePath/src/main/res/values/strings.xml")),
+                presetKeyMap)
 
         println("preset map : ${presetKeyMap.size}")
 
