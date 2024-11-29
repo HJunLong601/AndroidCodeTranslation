@@ -50,6 +50,7 @@ class BaiduTranslateImpl(private val appid: String, private val securityKey: Str
 
     override fun translateCN(input: String): String {
         try {
+            // api限制，直接加个延迟
             Thread.sleep(1000)
         } catch (e: InterruptedException) {
             throw RuntimeException(e)

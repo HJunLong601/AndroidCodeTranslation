@@ -1,4 +1,4 @@
-package com.hjl.translatecode
+package com.hjl.translatecode.filter
 
 interface ICodeStringFilter {
 

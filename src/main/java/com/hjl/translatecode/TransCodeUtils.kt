@@ -31,7 +31,7 @@ object TransCodeUtils {
     }
 
 
-    fun transOriginJavaCode(data: String, chineseInLine: Set<String>, xmlKeyMap: HashMap<String, String>, isJava: Boolean): String {
+    fun transOriginJavaCode(data: String, chineseInLine: Set<String>, keyMap: HashMap<String, String>, isJava: Boolean): String {
         if (chineseInLine.isEmpty()) return data
 
         // 所有的中文字符
@@ -44,7 +44,7 @@ object TransCodeUtils {
         // get xml key
         println("start trans key ")
         for (string in chineseInLine) {
-            if (xmlKeyMap.containsKey(string)) continue
+            if (keyMap.containsKey(string)) continue
 
             if (string.trim().equals("%s")) continue
 
@@ -52,23 +52,23 @@ object TransCodeUtils {
 
             if (!isJava && params.isNotEmpty()) {
                 val en = transApi.translateEN(formatStr)
-                val result = generateXMLItemKey(en, xmlKeyMap.values)
+                val result = generateStringItemKey(en, keyMap.values)
 
                 print("   $formatStr -> $en    ,  ")
-                xmlKeyMap[formatStr] = result
+                keyMap[formatStr] = result
             } else {
                 val en = transApi.translateEN(string)
-                val result = generateXMLItemKey(en, xmlKeyMap.values)
+                val result = generateStringItemKey(en, keyMap.values)
 
                 print("   $string -> $en    ,  ")
-                xmlKeyMap[string] = result
+                keyMap[string] = result
             }
 
 
         }
         println("end trans key ")
 
-        println("build xml key end,result : ${xmlKeyMap.size}")
+        println("build xml key end,result : ${keyMap.size}")
 
 
         var result = data
@@ -77,7 +77,7 @@ object TransCodeUtils {
             val (formatStr, params) = convertToStringFormat(string)
 
             if (!isJava && params.isNotEmpty()) {
-                val xmlKey = xmlKeyMap[formatStr]
+                val xmlKey = keyMap[formatStr]
                 if (xmlKey.isNullOrEmpty()) {
                     println("error ======>  $formatStr ")
                 }
@@ -91,7 +91,7 @@ object TransCodeUtils {
                 result = result.replace("\"" + string + "\"", newValue.toString())
                 println("replace $string with kotlin template")
             } else {
-                val xmlKey = xmlKeyMap[string]!!
+                val xmlKey = keyMap[string]!!
                 result = result.replace("\"" + string + "\"", getGenerateStringTemplate(xmlKey))
                 println("replace $string")
             }
@@ -140,7 +140,7 @@ object TransCodeUtils {
             if (xmlKeyMap.containsKey(key)) continue
 
             val en = transApi.translateEN(key)
-            val result = generateXMLItemKey(en, xmlKeyMap.values)
+            val result = generateStringItemKey(en, xmlKeyMap.values)
 
             print("  $key -> $en   , ")
             xmlKeyMap[key] = result
@@ -210,10 +210,9 @@ object TransCodeUtils {
 
     fun generateXMLItem(key: String, value: String) = "<string name=\"${key}\">${value}</string>"
 
-    fun generateXMLItemKey(name: String, existsKeys: Collection<String>): String {
+    fun generateStringItemKey(name: String, existsKeys: Collection<String>): String {
 
         var result = name.replace("please", "pls")
-                .replace("example", "exp")
                 .replace(" ", "_")
                 .replace("width", "w")
                 .replace("height", "h")

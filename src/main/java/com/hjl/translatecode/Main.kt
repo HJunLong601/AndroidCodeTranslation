@@ -1,10 +1,9 @@
 package com.hjl.translatecode
 
-import org.xml.sax.InputSource
+import com.hjl.translatecode.preset.IPresetKeyParser
+import com.hjl.translatecode.preset.XMLKeyParser
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileWriter
-import javax.xml.parsers.SAXParserFactory
 
 
 /**
@@ -45,33 +44,34 @@ object Main {
 
         // todo:替换为模块路径
         val modulePath = "E:\\AndroidProject\\LWanAndroid\\commonlib"
-        var xmlKeyMap = LinkedHashMap<String, String>() // 存放所有
+        // 预设的 中文 - key 映射表
+        val keyMap = LinkedHashMap<String, String>()
+        val presetKeyMap = LinkedHashMap<String, String>()
 
-        val handler = initPreSetKey("$modulePath/src/main/res/values/strings.xml")
-        xmlKeyMap.putAll(handler.map)
+        initPreSetKey(arrayOf(XMLKeyParser("$modulePath/src/main/res/values/strings.xml")), presetKeyMap)
 
-        println("pre set map : ${xmlKeyMap.size}")
+        println("preset map : ${presetKeyMap.size}")
+
+        keyMap.putAll(presetKeyMap)
+        checkModule(modulePath, checkCode, checkXML, keyMap)
 
 
-        checkModule(modulePath, checkCode, checkXML, xmlKeyMap)
-
-
-        println("====================  findXMLKey ${xmlKeyMap.size} =======================")
+        println("====================  findXMLKey ${keyMap.size} =======================")
 
         val resultXMLSb = StringBuilder()
 
         // 过滤掉已经存在的key
-        handler.map.keys.forEach {
-            xmlKeyMap.remove(it)
+        presetKeyMap.keys.forEach {
+            keyMap.remove(it)
         }
 
-        println("after filter  ${xmlKeyMap.size}")
+        println("after filter  ${keyMap.size}")
 
-        xmlKeyMap.keys.forEach {
+        keyMap.keys.forEach {
 
-            if (handler.map.containsKey(it)) return@forEach
+            if (presetKeyMap.containsKey(it)) return@forEach
 
-            val generateXMLItem = TransCodeUtils.generateXMLItem(xmlKeyMap[it]!!, it)
+            val generateXMLItem = TransCodeUtils.generateXMLItem(keyMap[it]!!, it)
             resultXMLSb.append(generateXMLItem).append("\n")
         }
 
@@ -163,16 +163,15 @@ object Main {
         }
     }
 
-    private fun initPreSetKey(xmlPath: String): StringXMLHandler {
-        val handler = StringXMLHandler()
-        try {
-            val factory = SAXParserFactory.newInstance()
-            val saxParser = factory.newSAXParser()
-            saxParser.parse(InputSource(FileInputStream(xmlPath)), handler)
-        } catch (e: Exception) {
-            e.printStackTrace()
+    /**
+     * 解析预设的key值
+     */
+    private fun initPreSetKey(keyParsers: Array<IPresetKeyParser>, map: MutableMap<String, String>) {
+
+        keyParsers.forEach {
+            it.parseKey(map)
         }
-        return handler
+
     }
 
 }

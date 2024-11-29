@@ -1,7 +1,5 @@
 package com.hjl.translatecode.filter
 
-import com.hjl.translatecode.ICodeStringFilter
-
 class NoteCodeFilter : ICodeStringFilter {
     override fun filter(string: String): Boolean {
 
