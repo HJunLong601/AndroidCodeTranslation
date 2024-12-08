@@ -4,9 +4,9 @@ interface ITranslateAPI {
 
 
     companion object {
-        val instance: ITranslateAPI by lazy {
-            BaiduTranslateImpl.instance!!
-        }
+
+        lateinit var instance: ITranslateAPI
+
     }
 
     fun translateCN(input: String): String

@@ -10,9 +10,25 @@ import java.security.NoSuchAlgorithmException
 
 class BaiduTranslateImpl(private val appid: String, private val securityKey: String) : ITranslateAPI {
 
+    companion object {
+        // 语种文档 https://open.fanyigou.com/filecore.html#page11
+        private const val TRANS_API_HOST = "http://api.fanyi.baidu.com/api/trans/vip/translate"
+
+        // todo:替换为自己的api
+        private const val APP_ID = "xxx"
+        private const val SECURITY_KEY = "xxx"
+        var instance: BaiduTranslateImpl? = null
+            get() {
+                if (field == null) field = BaiduTranslateImpl(APP_ID, SECURITY_KEY)
+                return field
+            }
+            private set
+    }
+
+
     private fun getTransResult(query: String?, from: String, to: String): String? {
         val params = buildParams(query, from, to)
-        return HttpGet.get(TRANS_API_HOST, params)
+        return HttpGet[TRANS_API_HOST, params]
     }
 
     private fun buildParams(query: String?, from: String, to: String): Map<String?, String?> {
@@ -78,21 +94,6 @@ class BaiduTranslateImpl(private val appid: String, private val securityKey: Str
         val resultAsJsonObject = transResult.asJsonObject
 
         return resultAsJsonObject["dst"].asString
-    }
-
-    companion object {
-        // 语种文档 https://open.fanyigou.com/filecore.html#page11
-        private const val TRANS_API_HOST = "http://api.fanyi.baidu.com/api/trans/vip/translate"
-
-        // todo:替换为自己的api
-        private const val APP_ID = "xxx"
-        private const val SECURITY_KEY = "xxx"
-        var instance: BaiduTranslateImpl? = null
-            get() {
-                if (field == null) field = BaiduTranslateImpl(APP_ID, SECURITY_KEY)
-                return field
-            }
-            private set
     }
 
     object MD5 {

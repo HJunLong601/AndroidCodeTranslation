@@ -10,10 +10,11 @@ import java.io.File
 
 object TransCodeUtils {
 
-    val outputLog = true
+    var outputLog = true
     var scanOnly = true
     val scanList = HashSet<String>()
 
+    // 代码匹配过滤器
     val codeFilter = listOf(NoteCodeFilter(), LogCodeFilter())
 
     // todo: 根据项目 返回对应的生成的字符串模版
@@ -26,12 +27,12 @@ object TransCodeUtils {
         return arrayOf("import com.hjl.commonlib.base.BaseApplication", "import com.hjl.commonlib.R")
     }
 
-    fun transOriginJavaCode(data: String, dataMap: HashMap<String, String>, isJava: Boolean): String {
+    fun transOriginJavaCode(data: String, dataMap: MutableMap<String, String>, isJava: Boolean): String {
         return transOriginJavaCode(data, getStringInLine(data, isJava), dataMap, isJava)
     }
 
 
-    fun transOriginJavaCode(data: String, chineseInLine: Set<String>, keyMap: HashMap<String, String>, isJava: Boolean): String {
+    fun transOriginJavaCode(data: String, chineseInLine: Set<String>, keyMap: MutableMap<String, String>, isJava: Boolean): String {
         if (chineseInLine.isEmpty()) return data
 
         // 所有的中文字符
@@ -46,7 +47,7 @@ object TransCodeUtils {
         for (string in chineseInLine) {
             if (keyMap.containsKey(string)) continue
 
-            if (string.trim().equals("%s")) continue
+            if (string.trim() == "%s") continue
 
             val (formatStr, params) = convertToStringFormat(string)
 
@@ -121,7 +122,7 @@ object TransCodeUtils {
     /**
      * 转换xml文本
      */
-    fun translateOriginXML(data: String, xmlKeyMap: HashMap<String, String>): String {
+    fun translateOriginXML(data: String, xmlKeyMap: MutableMap<String, String>): String {
 
         val chineseInLine = getStringInLine(data, true)
 
