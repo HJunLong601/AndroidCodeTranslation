@@ -16,6 +16,9 @@ class InitProcessor : IProcessor {
         TransCodeUtils.outputLog = config.outputLog
         TransCodeUtils.scanOnly = config.scanOnly
 
+        //
+        TransCodeUtils.importArray = config.importArray
+        TransCodeUtils.stringTemplateAction = config.stringTemplateAction
 
     }
 }

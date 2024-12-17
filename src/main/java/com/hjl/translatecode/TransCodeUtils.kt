@@ -18,20 +18,18 @@ object TransCodeUtils {
     val codeFilter = listOf(NoteCodeFilter(), LogCodeFilter())
 
     // todo: 根据项目 返回对应的生成的字符串模版
-    private fun getGenerateStringTemplate(xmlKey: String?): String {
-        return "BaseApplication.getApplication().getString(R.string.$xmlKey)"
-    }
-
     // todo: 根据项目 返回对应自动导入的包
-    fun getImportString(): Array<String> {
-        return arrayOf("import com.hjl.commonlib.base.BaseApplication", "import com.hjl.commonlib.R")
-    }
+    var importArray: Array<String> = emptyArray()
+    lateinit var stringTemplateAction: ((xmlKey: String?) -> String)
 
     fun transOriginJavaCode(data: String, dataMap: MutableMap<String, String>, isJava: Boolean): String {
         return transOriginJavaCode(data, getStringInLine(data, isJava), dataMap, isJava)
     }
 
 
+    /**
+     * 转换代码 java、kotlin
+     */
     fun transOriginJavaCode(data: String, chineseInLine: Set<String>, keyMap: MutableMap<String, String>, isJava: Boolean): String {
         if (chineseInLine.isEmpty()) return data
 
@@ -83,7 +81,7 @@ object TransCodeUtils {
                     println("error ======>  $formatStr ")
                 }
 
-                val newValue = StringBuilder("String.format(").append(getGenerateStringTemplate(xmlKey))
+                val newValue = StringBuilder("String.format(").append(stringTemplateAction!!.invoke(xmlKey))
                 params.forEach {
                     newValue.append(",$it")
                 }
@@ -93,7 +91,7 @@ object TransCodeUtils {
                 println("replace $string with kotlin template")
             } else {
                 val xmlKey = keyMap[string]!!
-                result = result.replace("\"" + string + "\"", getGenerateStringTemplate(xmlKey))
+                result = result.replace("\"" + string + "\"", stringTemplateAction!!.invoke(xmlKey))
                 println("replace $string")
             }
 
@@ -102,7 +100,7 @@ object TransCodeUtils {
         // 自动导包
         val firstLine = result.split("\n")[0]
         var appendImport = firstLine
-        getImportString().forEach {
+        importArray.forEach {
 
             if (!result.contains(it)) {
                 appendImport += if (isJava) {
@@ -270,19 +268,28 @@ object TransCodeUtils {
         return abbr.toLowerCase()
     }
 
+    /**
+     * 提取所有英文字符
+     */
     fun extractChars(string: String): String {
-        // 提取所有英文字符
         val englishChars = string.filter { it in 'A'..'Z' || it in 'a'..'z' || it == '_' }
 
         return englishChars
     }
 
 
+    /**
+     * 拷贝到粘贴板
+     */
     fun copyToClipboard(content: String?) {
         val selection = StringSelection(content)
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null)
     }
 
+
+    /**
+     * 便利文件夹
+     */
     fun traverseFolder(directory: File, action: (file: File) -> Unit) {
         // 确保是文件夹
         if (!directory.isDirectory) return
@@ -299,6 +306,16 @@ object TransCodeUtils {
                 action.invoke(file)
             }
         }
+    }
+
+    // 判断整个字符串是否都是中文
+    fun String.isChineseOnly(): Boolean {
+        return matches(Regex("^[\\u4E00-\\u9FA5]+$"))
+    }
+
+    // 判断字符串是否包含中文
+    fun String.containsChinese(): Boolean {
+        return contains(Regex("[\\u4E00-\\u9FA5]"))
     }
 
 }

@@ -4,6 +4,8 @@ import com.hjl.translatecode.TransCodeUtils
 import com.hjl.translatecode.TranslateConfig
 import java.io.File
 import java.io.FileWriter
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ResultOutputProcessor : IProcessor {
     override fun process(config: TranslateConfig) {
@@ -33,7 +35,8 @@ class ResultOutputProcessor : IProcessor {
         // 结果输出到模块目录
         println(resultXMLSb)
         TransCodeUtils.copyToClipboard(resultXMLSb.toString())
-        File("${config.modulePath}/appendedTranslateResult.txt").apply {
+
+        File("${config.modulePath}/appendedTranslateResult_${SimpleDateFormat("MM-dd_HH-mm-ss").format(Date())}.txt").apply {
             println("write result:${this.absolutePath}")
             createNewFile()
             FileWriter(this).apply {

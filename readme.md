@@ -54,16 +54,13 @@ val config = TranslateConfig(presetKeyMap, keyMap, modulePath, false, false)
 5. 配置自动导包的内容，根据项目自行实现
 
 ```kotlin
-// TransCodeUtils.kt
 // todo: 根据项目 返回对应的生成的字符串模版
-private fun getGenerateStringTemplate(xmlKey: String?): String {
-    return "BaseApplication.getApplication().getString(R.string.$xmlKey)"
-}
-
 // todo: 根据项目 返回对应自动导入的包
-fun getImportString(): Array<String> {
-    return arrayOf("import com.hjl.commonlib.base.BaseApplication", "import com.hjl.commonlib.R")
-}
+val config = TranslateConfig(presetKeyMap, keyMap, modulePath, { xmlKey: String? ->
+    return@TranslateConfig "BaseApplication.getApplication().getString(R.string.$xmlKey)"
+},
+        importArray = arrayOf("import com.hjl.commonlib.base.BaseApplication", "import com.hjl.commonlib.R")
+)
 
 ```
 

@@ -9,8 +9,6 @@ class NoteCodeFilter : ICodeStringFilter {
             return true
         }
 
-
-
         return false
     }
 }

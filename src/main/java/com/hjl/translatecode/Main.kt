@@ -41,7 +41,11 @@ object Main {
         val keyMap = LinkedHashMap<String, String>()
         val presetKeyMap = LinkedHashMap<String, String>()
 
-        val config = TranslateConfig(presetKeyMap, keyMap, modulePath, false, false)
+        val config = TranslateConfig(presetKeyMap, keyMap, modulePath, { xmlKey: String? ->
+            return@TranslateConfig "BaseApplication.getApplication().getString(R.string.$xmlKey)"
+        },
+                importArray = arrayOf("import com.hjl.commonlib.base.BaseApplication", "import com.hjl.commonlib.R")
+        )
 
         // todo: 初始化配置 end
 
